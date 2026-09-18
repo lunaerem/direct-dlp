@@ -63,5 +63,6 @@ dkms.conf
 
 # Project Specific
 *.txt
+*.ini
 direct-dlp
 yt-dlp

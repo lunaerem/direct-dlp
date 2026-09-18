@@ -1,3 +1,4 @@
+#include "fio.h"
 #include <getopt.h>
 #include <stdio.h>
 #include <unistd.h>
@@ -12,27 +13,51 @@ int main(int argc, char *argv[]) {
   int rv = 0;
   int opt_index = 0;
 
+  // Checking if a config.ini exists and prompting if not
+  // TODO: Implement custom ini locations?
+  rv = check_config("config.ini");
+  if (rv)
+    return rv;
+
+  // TODO: If a config file is found, load it into memory
+
+  // Checking if yt-dlp is installed
+  // TODO: Allow for custom yt-dlp paths based on the user's config
+  rv = check_ytdlp("yt-dlp");
+  if (rv)
+    return rv;
+
+  // Checking if a list.txt exists and prompting if not
+  // TODO: Implement optional usage of a list.txt based on user config and
+  // custom paths for it
+  rv = check_list("list.txt");
+  if (rv)
+    return rv;
+
   // Checking that there is at least one argument
   if (argc < 2) {
-    // GUI not implemented yet
+    // TODO: Implement GUI
     fprintf(stderr,
             "Usage error: Only the CLI version of Direct-DLP is currently "
-            "supported as the GUI version is a work in progress. See "
+            "supported as the GUI version is a work in progress. The CLI "
+            "version requires at least one option passed. See "
             "direct-dlp -h for details.\n");
     return -1;
   }
 
+  // TODO: Add long switch aliases where applicable
   static struct option long_options[] = {{"version", no_argument, 0, 0},
                                          {"help", no_argument, 0, 'h'}
 
   };
 
   // Checking through the arguments
-  while ((opt = getopt_long(argc, argv, "v:hla:c:", long_options,
+  while ((opt = getopt_long(argc, argv, "v:hla:c:ub:", long_options,
                             &opt_index)) != -1) {
 
     switch (opt) {
     case 0:
+      // TODO: Get rid of debug print when no longer needed
       printf("[Debug] Long option: %s\n", long_options[opt_index].name);
       switch (opt_index) {
       case 0:
@@ -44,23 +69,37 @@ int main(int argc, char *argv[]) {
       }
       break;
     case 'v':
+      // TODO: Implement video downloading
       printf("[Debug] Download Video: %s\n", optarg);
       fprintf(stderr, "Currently not implemented yet, sorry.\n");
       break;
-      break;
+    // TODO: Remove Legacy code
     case 'l':
       rv = legacyui();
       break;
     case 'a':
+      // TODO: Implement downloading audio
       printf("[Debug] Download Audio: %s\n", optarg);
       fprintf(stderr, "Currently not implemented yet, sorry.\n");
       break;
     case 'h':
+      // TODO: Implement Help
       printf("[Debug] Help\n");
       fprintf(stderr, "Currently not implemented yet, sorry.\n");
       break;
     case 'c':
+      // TODO: Implement configuration changing
       printf("[Debug] Configure: %s\n", optarg);
+      fprintf(stderr, "Currently not implemented yet, sorry.\n");
+      break;
+    case 'u':
+      // TODO: Implement updating
+      printf("[Debug] Update\n");
+      fprintf(stderr, "Currently not implemented yet, sorry.\n");
+      break;
+    case 'b':
+      // TODO: Implement config file backup
+      printf("[Debug] Backup destination: %s\n", optarg);
       fprintf(stderr, "Currently not implemented yet, sorry.\n");
       break;
     case '?':
@@ -71,11 +110,15 @@ int main(int argc, char *argv[]) {
     }
   }
 
+  // TODO: Remove debug when no longer necessary
+  printf("[Debug] rv = %d\n", rv);
+
   return rv;
 }
 
 // Code for the legacy UI system
 // Will be deprecated in the future
+// TODO: Remove legacy code
 // -------------------------------
 #include "fio.h"
 #include <errno.h>
