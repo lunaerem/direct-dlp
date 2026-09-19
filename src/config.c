@@ -82,6 +82,7 @@ int free_config(config_entry *config) {
   // initialisation is rewritten
   for (int i = 0; i < 100; i++) {
     if (config[i].name != NULL) {
+      // TODO: Get rid of debugging printing
       printf("[Debug] Freeing config #%d, %s, %s, %s\n", i, config[i].name,
              config[i].value, config[i].section);
       free(config[i].name);
@@ -90,6 +91,7 @@ int free_config(config_entry *config) {
     }
   }
 
+  // TODO: Get rid of debugging printing
   printf("[Debug] Freeing config\n");
   free(config);
 

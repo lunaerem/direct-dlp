@@ -4,8 +4,6 @@
 
 #include <stdio.h>
 
-#define MAP_SIZE 100
-
 typedef struct config_entry {
   char *section;
   char *name;

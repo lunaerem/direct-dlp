@@ -19,7 +19,8 @@ int fcheck(const char *fname) {
 }
 
 int check_ytdlp(const char *fname) {
-  // TODO: Allow for custom yt-dlp paths based on the user's config
+  // TODO: Implement better custom yt-dlp directory support so that it actually
+  // checks if yt-dlp exists there instead of whether the given directory exists
   switch (fcheck(fname)) {
   case -1:
     perror("Unknown error");
@@ -37,8 +38,11 @@ int check_ytdlp(const char *fname) {
 }
 
 int check_list(const char *fname) {
-  // TODO: Implement optional usage of a list.txt based on user config and
-  // custom paths for it
+  // TODO: Implement better custom list.txt directory support so that it
+  // actually checks if list.txt exists there instead of whether the given
+  // directory exists Also need to create the list.txt in the desired directory
+  // instead of defaulting to the current directory that the program is
+  // installed in
   switch (fcheck(fname)) {
   case -1:
     perror("Unknown error");

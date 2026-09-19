@@ -3,6 +3,7 @@
 #include <getopt.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 #include <unistd.h>
 
 #define VERSION "0.1.0"
@@ -10,6 +11,8 @@
 int legacyui();
 
 int main(int argc, char *argv[]) {
+
+  // TODO: Add a verbose or debug logging mode?
 
   int opt;
   int rv = 0;
@@ -30,20 +33,20 @@ int main(int argc, char *argv[]) {
   read_config("config.ini", config);
 
   // Checking if yt-dlp is installed
-  // TODO: Allow for custom yt-dlp paths based on the user's config
-  rv = check_ytdlp("yt-dlp");
+  rv = check_ytdlp(fetch_config(config, "General", "yt-dlp-loc"));
   if (rv) {
     free_config(config);
     return rv;
   }
 
-  // Checking if a list.txt exists and prompting if not
-  // TODO: Implement optional usage of a list.txt based on user config and
-  // custom paths for it
-  rv = check_list("list.txt");
-  if (rv) {
-    free_config(config);
-    return rv;
+  // Checking if the user wishes to use a list.txt
+  if (strcmp(fetch_config(config, "General", "use-list"), "yes") == 0) {
+    // If so, check if it exists and prompt for its creation if not
+    rv = check_list(fetch_config(config, "General", "list-loc"));
+    if (rv) {
+      free_config(config);
+      return rv;
+    }
   }
 
   // Checking that there is at least one argument
