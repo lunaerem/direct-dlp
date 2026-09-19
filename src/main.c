@@ -1,6 +1,8 @@
+#include "config.h"
 #include "fio.h"
 #include <getopt.h>
 #include <stdio.h>
+#include <stdlib.h>
 #include <unistd.h>
 
 #define VERSION "0.1.0"
@@ -12,6 +14,11 @@ int main(int argc, char *argv[]) {
   int opt;
   int rv = 0;
   int opt_index = 0;
+  // TODO: Come up with a better way to initialise the size of the config array
+  // without the use of a magic number
+  // TODO: Rewrite to use a hashmap or linked list with better storage and
+  // sorting, just needed something preliminary to work
+  config_entry *config = (config_entry *)malloc(sizeof(config_entry) * 100);
 
   // Checking if a config.ini exists and prompting if not
   // TODO: Implement custom ini locations?
@@ -19,20 +26,25 @@ int main(int argc, char *argv[]) {
   if (rv)
     return rv;
 
-  // TODO: If a config file is found, load it into memory
+  // TODO: Implement custom ini locations?
+  read_config("config.ini", config);
 
   // Checking if yt-dlp is installed
   // TODO: Allow for custom yt-dlp paths based on the user's config
   rv = check_ytdlp("yt-dlp");
-  if (rv)
+  if (rv) {
+    free_config(config);
     return rv;
+  }
 
   // Checking if a list.txt exists and prompting if not
   // TODO: Implement optional usage of a list.txt based on user config and
   // custom paths for it
   rv = check_list("list.txt");
-  if (rv)
+  if (rv) {
+    free_config(config);
     return rv;
+  }
 
   // Checking that there is at least one argument
   if (argc < 2) {
@@ -42,6 +54,7 @@ int main(int argc, char *argv[]) {
             "supported as the GUI version is a work in progress. The CLI "
             "version requires at least one option passed. See "
             "direct-dlp -h for details.\n");
+    free_config(config);
     return -1;
   }
 
@@ -62,6 +75,7 @@ int main(int argc, char *argv[]) {
       switch (opt_index) {
       case 0:
         printf("direct-dlp version: %s\n", VERSION);
+        free_config(config);
         return rv;
         break;
       default:
@@ -111,7 +125,8 @@ int main(int argc, char *argv[]) {
   }
 
   // TODO: Remove debug when no longer necessary
-  printf("[Debug] rv = %d\n", rv);
+  printf("[Debug] Exiting with rv = %d\n", rv);
+  free_config(config);
 
   return rv;
 }
