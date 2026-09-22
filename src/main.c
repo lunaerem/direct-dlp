@@ -68,7 +68,7 @@ int main(int argc, char *argv[]) {
   };
 
   // Checking through the arguments
-  while ((opt = getopt_long(argc, argv, "v:hla:c:ub:", long_options,
+  while ((opt = getopt_long(argc, argv, "v:ha:c:ub:", long_options,
                             &opt_index)) != -1) {
 
     switch (opt) {
@@ -89,10 +89,6 @@ int main(int argc, char *argv[]) {
       // TODO: Implement video downloading
       printf("[Debug] Download Video: %s\n", optarg);
       fprintf(stderr, "Currently not implemented yet, sorry.\n");
-      break;
-    // TODO: Remove Legacy code
-    case 'l':
-      rv = legacyui();
       break;
     case 'a':
       // TODO: Implement downloading audio
@@ -134,17 +130,9 @@ int main(int argc, char *argv[]) {
   return rv;
 }
 
-// Code for the legacy UI system
-// Will be deprecated in the future
 // TODO: Remove legacy code
 // -------------------------------
-#include "fio.h"
-#include <errno.h>
-#include <stdio.h>
-#include <unistd.h>
-
-int legacyui() {
-
+/*
   // Declaring and initialising commands
   // This will get cleaned up once things are rewritten for custom options
   // For now, this will stay pretty unoptimised and messy until then
@@ -187,49 +175,6 @@ int legacyui() {
       NULL};
 
   char *list4[4] = {"python3", "yt-dlp", "-U", NULL};
-
-  // Checking if yt-dlp is installed
-  switch (fcheck("yt-dlp")) {
-  case -1:
-    perror("Unknown error");
-    return -1;
-    break;
-  case -2:
-    fprintf(stderr, "Failed to find yt-dlp. Please ensure it is installed and "
-                    "in the current directory.\n");
-    return -1;
-    break;
-  default:
-    break;
-  }
-
-  // Checking if a list.txt exists and prompting if not
-  switch (fcheck("list.txt")) {
-  case -1:
-    perror("Unknown error");
-    return -1;
-    break;
-  case -2:
-    fprintf(stderr, "No list.txt found.\n");
-    printf("Would you like one to be created? (y/n) ");
-    char selection;
-    scanf(" %c", &selection);
-    if (selection == 'y') {
-      FILE *fp = fopen("list.txt", "a");
-      if (fp != NULL) {
-        printf("list.txt successfully created.\n");
-      } else {
-        fprintf(stderr,
-                "Failed to create list.txt (Check file permissions).\n");
-        return -1;
-      }
-      fclose(fp);
-    }
-    return 0;
-    break;
-  default:
-    break;
-  }
 
   printf("\e[1;1H\e[2J");
 
@@ -274,4 +219,4 @@ int legacyui() {
   perror("Failed to execute python and yt-dlp");
 
   return errno;
-}
+}*/
