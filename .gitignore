@@ -66,3 +66,4 @@ dkms.conf
 *.ini
 direct-dlp
 yt-dlp
+*.bak

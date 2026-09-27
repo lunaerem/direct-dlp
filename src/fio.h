@@ -61,4 +61,17 @@ int check_list(const char *fname);
  */
 int check_config(const char *fname);
 
+/*
+ * Duplicates the given file to the desired location
+ *
+ * Parameters:
+ * fname - Path to the file to duplicate
+ * fdupe - Path to the desired duplication location
+ *
+ * Return Values:
+ * 0 - Success
+ * -1 - An error occured
+ */
+int fbackup(const char *fname, const char *fdupe);
+
 #endif

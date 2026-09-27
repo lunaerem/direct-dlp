@@ -111,9 +111,8 @@ int main(int argc, char *argv[]) {
       fprintf(stderr, "Currently not implemented yet, sorry.\n");
       break;
     case 'b':
-      // TODO: Implement config file backup
-      printf("[Debug] Backup destination: %s\n", optarg);
-      fprintf(stderr, "Currently not implemented yet, sorry.\n");
+      // TODO: Support custom .ini file locations?
+      rv = fbackup("config.ini", optarg);
       break;
     case '?':
       break;

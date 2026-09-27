@@ -1,9 +1,15 @@
 // Code for handling file I/O
 #include "fio.h"
 #include "config.h"
+#include <dirent.h>
+#include <errno.h>
+#include <stdio.h>
+#include <string.h>
+#include <unistd.h>
 
 int fcheck(const char *fname) {
 
+  // TODO: Replace access because it is not portable
   if (access(fname, F_OK) != 0) {
     if (errno != ENOENT) {
       // Unknown error
@@ -107,5 +113,108 @@ int check_config(const char *fname) {
   default:
     break;
   }
+  return 0;
+}
+
+int fbackup(const char *fname, const char *fdupe) {
+
+  FILE *copier = fopen(fname, "rb");
+  char input;
+  // TODO: Rewrite to get rid of magic numbers 512 and 4096
+  char full[512];
+  char buff[4096];
+  size_t bytes_read;
+  size_t bytes_written;
+
+  // TODO Rewrite this, temp
+  const char *desired_name = "config.ini.bak";
+
+  snprintf(full, sizeof(full), "%s/%s", fdupe, desired_name);
+
+  printf("Backing up user configuration file to %s\n", full);
+
+  // Checking if file to copy was opened
+  if (copier == NULL) {
+    perror("Unable to open user configuration file.");
+    return -1;
+  }
+
+  // Opening the desired directory
+  DIR *dir = opendir(fdupe);
+
+  if (dir == NULL) {
+    perror("Unable to open desired directory");
+    fclose(copier);
+    return -1;
+  }
+
+  struct dirent *entry;
+
+  errno = 0;
+
+  // Checking if there exists a backup at the location
+  while ((entry = readdir(dir))) {
+    if (strcmp(desired_name, entry->d_name) == 0) {
+      // Prompting the user if a backup config is already there
+      fprintf(stderr,
+              "[Warning] A backup user configuration file already exists at "
+              "the given destination (%s).\n",
+              fdupe);
+      printf("The prexisting backup file will be overwritten. Proceed? [y/n] ");
+      // TODO: Maybe change to not use scanf
+      scanf(" %c", &input);
+      if (input == 'n' || input == 'N') {
+        closedir(dir);
+        fclose(copier);
+        printf("Execution halted, no backup configuration created.\n");
+        return 0;
+      }
+    }
+  }
+
+  closedir(dir);
+
+  // Checking to see if there was an error with readdir
+  if (errno) {
+    perror("Failed to search directory to duplicate user configuration file.");
+    fclose(copier);
+    return -1;
+  }
+
+  // Copy the file
+  // TODO: Get rid of debug printing
+  printf("[Debug] Full path: %s\n", full);
+
+  FILE *copy = fopen(full, "wb");
+
+  // Checking if file to copy to was opened
+  if (copy == NULL) {
+    perror("Unable to open user configuration backup to copy to.");
+    fclose(copier);
+    return -1;
+  }
+
+  // TODO rewrite to get rid of magic number 4096
+  while ((bytes_read = fread(buff, 1, 4096, copier)) > 0) {
+    bytes_written = fwrite(buff, 1, bytes_read, copy);
+    if (bytes_read > bytes_written) {
+      perror("Read/Write mismatch. Number of bytes read from config file "
+             "greater than number written to backup file.");
+      fprintf(stderr,
+              "[Warning] Config backup failed during read/write, there may be "
+              "a partial configuration backup at %s\n",
+              full);
+      fclose(copier);
+      fclose(copy);
+      return -1;
+    }
+  }
+
+  printf("Backup user configuration file successfully created at %s\n", full);
+
+  // Cleaning up
+  fclose(copier);
+  fclose(copy);
+
   return 0;
 }
